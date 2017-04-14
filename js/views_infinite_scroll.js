@@ -1,10 +1,21 @@
-(function ($) {
+var VIS = VIS || {};
+(function ($, VIS) {
 
   /**
    * Attach infinite scroll to the relevant views.
+   * Autopage will override anything in script tags
+   * For the sake of javascript overwriting global variables
    */
-  Drupal.behaviors.views_infinite_scroll = {
+  VIS.VFI = VIS.VFI || {
     attach: function (context, settings) {
+      if (this.ran) {
+        return;
+      }
+      this.ran = true;
+      settings = settings || Drupal.settings;
+      if (!settings.views_infinite_scroll) {
+        return ;
+      }
 
       // Make sure that autopager plugin is loaded.
       if (!$.autopager) {
@@ -13,6 +24,16 @@
       }
 
       var settings = settings.views_infinite_scroll[0];
+      // Fix the multi
+      if (settings.content_selector.substring(0,1) != '>') {
+        settings.content_selector = '> ' + settings.content_selector;
+      }
+      if (settings.pager_selector.substring(0,1) != '>') {
+        settings.pager_selector = '> div.item-list ' + settings.pager_selector;
+      }
+      if (settings.items_selector.substring(0,1) != '>') {
+        settings.items_selector = '> ' + settings.items_selector;
+      }
 
       // Ensure we are refreshing the view component.
       var view_selector = 'div.view-id-' + settings.view_name + '.view-display-id-' + settings.display;
@@ -24,21 +45,28 @@
       // Destroy an existing instance of autopager.
       $.autopager('destroy');
 
-      var content_selector = view_selector + ' > ' + settings.content_selector;
-      var $items = $view.find(settings.items_selector);
-      var $pager = $view.find('> div.item-list ' + settings.pager_selector);
+      var content_selector = view_selector + ' ' + settings.content_selector;
+      var $items = $view.find(settings.content_selector + ' ' + settings.items_selector);
+      var $pager = $view.find(settings.pager_selector);
       var next_selector = view_selector + ' ' + settings.next_selector;
       var $next = $(next_selector);
 
-      var $img_location = $view.find('div.view-content');
+      var $img_location = $view.find('> div.view-content');
       var img_path = settings.img_path;
       var img = '<div id="views_infinite_scroll-ajax-loader"><img src="' + img_path + '" alt="loading..."/></div>';
 
       $($pager).hide();
+      var group_selector = '', group_holder_selector = '';
+      if (settings.content_selector === '> div.view-content > table > tbody') {
+        group_selector = view_selector + ' > div.view-content > table' ;
+        group_holder_selector = view_selector + ' > div.view-content' ;
+      }
       $.autopager({
         appendTo: content_selector,
         content: content_selector + ' ' + settings.items_selector,
         link: next_selector,
+        group_selector: group_selector,
+        group_holder_selector: group_holder_selector,
         page: 0,
         autoLoad: !settings.manual_load,
         start: function () {
@@ -46,7 +74,8 @@
         },
         load: function (current, next) {
           $('div#views_infinite_scroll-ajax-loader').remove();
-          Drupal.attachBehaviors(this);
+          // attachBehaviors on the whole view
+          Drupal.attachBehaviors($view);
           // Use >= because of views page numbers begin at 0.
           if (settings.manual_load && next.page >= settings.pager_max) {
             $next.hide();
@@ -85,4 +114,6 @@
     }
   };
 
-})(jQuery);
+  Drupal.behaviors.views_infinite_scroll = VIS.VFI;
+
+})(jQuery, VIS);

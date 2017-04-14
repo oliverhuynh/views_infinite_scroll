@@ -80,6 +80,7 @@ class views_plugin_pager_infinite_scroll extends views_plugin_pager_full {
         $content_selector = 'div.view-content>' . $wrapper_class . ' > *';
         $items_selector = '.views-row';
         break;
+      case 'footable':
       case 'table':
         $content_selector = 'div.view-content > table > tbody';
         $items_selector = 'tr';
