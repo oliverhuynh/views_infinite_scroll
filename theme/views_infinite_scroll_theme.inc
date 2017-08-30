@@ -85,6 +85,7 @@ function theme_views_infinite_scroll_pager($variables) {
           'manual_load' => $manual_load,
           'text' => t($text),
           'pager_max' => $pager_max,
+          'disablescript' => isset($variables['disablescript']) && $variables['disablescript']
         ),
       ),
     );

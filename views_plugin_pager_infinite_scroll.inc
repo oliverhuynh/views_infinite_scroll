@@ -13,6 +13,7 @@ class views_plugin_pager_infinite_scroll extends views_plugin_pager_full {
   function option_definition() {
     $options = parent::option_definition();
     $options['manual_load'] = array('default' => 0);
+    $options['disablescript'] = array('default' => 0);
     $options['text'] = array('default' => 'Show More', 'translatable' => TRUE);
     return $options;
   }
@@ -29,6 +30,14 @@ class views_plugin_pager_infinite_scroll extends views_plugin_pager_full {
       '#default_value' => $this->options['manual_load'],
       '#weight' => -10,
     );
+    $form['disablescript'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Disable script'),
+      '#description' => t('Disable script for faster loading.'),
+      '#default_value' => $this->options['disablescript'],
+      '#weight' => -10,
+    );
+
 
     $form['text'] = array(
       '#type' => 'textfield',
@@ -98,6 +107,7 @@ class views_plugin_pager_infinite_scroll extends views_plugin_pager_full {
         'element' => $this->options['id'],
         'manual_load' => $this->options['manual_load'],
         'text' => $this->options['text'],
+        'disablescript' => $this->options['disablescript'],
       )
     );
   }

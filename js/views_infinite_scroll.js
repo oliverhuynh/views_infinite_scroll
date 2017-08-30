@@ -62,6 +62,7 @@ var VIS = VIS || {};
         group_holder_selector = view_selector + ' > div.view-content' ;
       }
       $.autopager({
+        disablescript: settings.disablescript,
         appendTo: content_selector,
         content: content_selector + ' ' + settings.items_selector,
         link: next_selector,

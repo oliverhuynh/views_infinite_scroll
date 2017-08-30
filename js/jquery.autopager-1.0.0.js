@@ -11,6 +11,7 @@
 		defaults = {
 			autoLoad: true,
 			page: 1,
+      disablescript: false,
       group_selector: '',
       group_holder_selector: '',
 			content: '.content',
@@ -169,14 +170,17 @@
   }
 
 	function insertContent(res) {
+    if (options.disablescript) {
+      res = res.replace(/<script(.|\s)*?\/script>/g, "");// Allow script to get the setting turned on.
+    }
+
 		var _options = options,
-			nextPage = $('<div/>').append(res),//.replace(/<script(.|\s)*?\/script>/g, "")),// Allow script to get the setting turned on.
+			nextPage = $('<div/>').append(res),
 /*
 			nextPage = $('<div/>').append(res.replace(new RegExp("<script", 'g'), "<s1rpt")).replace(new RegExp("script>", 'g'), "s1rpt>")),//(/<script(.|\s)*?\/script>/g, "")),
       nextScripts = nextPage.find('s1rpt'),
 			nextContent = nextPage.find(_options.content);*/
 			nextContent;
-
 		set('page', _options.page + 1);
 		setUrl(nextPage);
     nextContent = groupHandle(nextPage);
